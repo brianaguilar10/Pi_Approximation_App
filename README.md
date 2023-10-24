@@ -10,4 +10,5 @@ This Course Project expects us to create a simple application using Shiny and cr
 Here are the links for the application and the presentation:
 
 Application Link: https://cp1ohg-brian-aguilar.shinyapps.io/Pi_Approximation/
+
 Presentation Link: https://rpubs.com/aguilarbrian10/pi_approximation
