@@ -1,0 +1,117 @@
+---
+title: 'Course Project: Shiny Application and Reproducible Pitch'
+author: "Brian Aguilar"
+date: "2023-10-24"
+output: ioslides_presentation
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+## π Approximation
+
+This is a **π Approximation Application** where you can visualize how the value of π can be approximated using a Monte Carlo Simulation.
+
+A **Monte Carlo Estimation** method is a process of acquiring a numerical result through the use of *simulations* that involves  *generation of random points* between -1 to 1 and then compute for the ratio of the number of points inside the circle versus the number of points inside the square to estimate the value of π.
+
+Application Link: 
+
+https://cp1ohg-brian-aguilar.shinyapps.io/Pi_Approximation/
+
+Repository Link: 
+
+https://github.com/brianaguilar10/Pi_Approximation_App/
+
+## Concept and Formula
+
+We have a unit circle of radius = 1 and is circumscribing a square (which means that the circle is inside the square). Theoretically, the ratio between the area of the circle and a square would be computed as follows:
+
+$$
+\begin{align}
+    \ \frac{A_{circle}}{A_{square}} =  \frac{\pi r^2}{{s}^2} =  \frac{\pi r^2}{{(2r)}^2} =  \frac{\pi r^2}{4r^2} =  \frac{\pi}{4}\  \ \mathrm{(s = 2r)}
+\end{align}
+$$ 
+
+Now we will generate random points inside the square and the number of points can be represented as the approximate area and the more points simulated yields more accurate ratio and estimation.
+
+$$
+\begin{align}
+  \ \frac{A_{circle}}{A_{square}}\approx \frac{ \#  \ of \ P_{circle}}{ \#  \ of \ P_{square}} \approx \frac{\pi}{4}\ \ \mathrm{(unit\ circle)}
+\end{align}
+$$
+
+## Functions and Features
+
+Thus, to estimate the value of π, the it can be computed by:
+
+$$
+\begin{align}
+  \require{enclose}
+  \ 4 \times \frac{ \#  \ of \ P_{circle}}{ \#  \ of \ P_{square}} \approx \pi 
+\end{align}
+$$
+
+Some other customizable features:
+
+-   You can **adjust the number of points** ranging from 0 to 1000 (maximum)
+-   You can **adjust the point size** ranging from 1 to 10 based on preference
+-   You can **toggle off the outline** of the shapes to see how the points develop
+
+## Monte Carlo Pi Approximation
+
+```{r}
+
+library(ggplot2)
+
+n_max = 1000
+inside_color = 'blue'
+outside_color = 'black'
+
+set.seed(pi)
+x_scatter <- runif(n_max, -1, 1)
+y_scatter <- runif(n_max, -1, 1)
+color_scatter <- ifelse(sqrt(x_scatter**2 + y_scatter**2) <= 1, inside_color, outside_color)
+
+# Create data for the circle
+radius <- 1
+center_x <- 0
+center_y <- 0
+n_points <- 100  # Number of points to approximate the circle
+
+# Calculate points on the circle
+theta <- seq(0, 2 * pi, length.out = n_points)
+x_circle <- center_x + radius * cos(theta)
+y_circle <- center_y + radius * sin(theta)
+
+# Create a data frame for the circle
+circle_data <- data.frame(x = x_circle, y = y_circle)
+
+# Create data for the square
+square_size <- 2 * radius
+x_square <- c(center_x - square_size / 2, center_x + square_size / 2, center_x + square_size / 2, center_x - square_size / 2)
+y_square <- c(center_y - square_size / 2, center_y - square_size / 2, center_y + square_size / 2, center_y + square_size / 2)
+
+# Create a data frame for the square
+square_data <- data.frame(x = x_square, y = y_square)
+
+# The data frame of the scatter data with its color
+scatter_data <- data.frame(x = x_scatter, 
+                           y = y_scatter, 
+                           color = color_scatter)
+
+# Whether to show the outline or not
+outline <- 'black'
+
+# Draw the scatterplot based on the number of points in the slider
+ggplot() +
+  geom_path(data = circle_data, aes(x, y), color = outline) +  # Circle
+  geom_polygon(data = square_data, aes(x, y), fill = NA, color = outline) +  # Square
+  geom_point(data = scatter_data, aes(x, y), color = color_scatter, size = 2.5) +  # Scatterplot
+  coord_fixed(ratio = 1) +  # Ensure an equal aspect ratio for a circular appearance
+  labs(x = "X-axis", y = "Y-axis") +  # Axis labels
+  theme_void() + 
+  theme(legend.position = "none")
+```
+
+This simulation has 793 points inside the circle and 1000 points inside the square with an approximate of π = 3.172.
